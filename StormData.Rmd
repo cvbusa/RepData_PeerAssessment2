@@ -3,6 +3,9 @@ title: 'Health and Economic Consequences of Storms: 1950 - 2011'
 author: "Charles Brown"
 date: "Wednesday, March 18, 2015"
 output:
+  word_document: default
+  pdf_document:
+    toc: yes
   html_document:
     fig_caption: yes
     keep_md: yes
