@@ -9,6 +9,14 @@ output:
     fig_caption: yes
     keep_md: yes
     toc: yes
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 8
+    number_sections: yes
+    toc: yes
+  word_document: default
+geometry: margin=1.5cm
 ---
 
 ### Synopsis  
@@ -36,88 +44,155 @@ if (!file.exists(strPathFilename))
 
 * Read select columns into data frame `df`.
 
-```{r, ReadDataIntoDataFrame}
-df <-read.csv(file = strPathFilename, stringsAsFactors = FALSE, colClasses = c(rep("NULL",7),"character",rep("NULL",14),rep("numeric",3),"character","numeric","character",rep("NULL",9)))
+```{r, ReadDataIntoDataFrame, cache=TRUE}
+df <-read.csv(file = strPathFilename, stringsAsFactors = FALSE,
+              colClasses = c(rep("NULL",7),"character",rep("NULL",14),
+                             rep("numeric",3),"character","numeric","character",
+                             rep("NULL",9)))
 summary(df)
 ```
 
-* #### Calculate A New Event Group Variable `(df$EVTGROUP)` to summarize the `r length(table(df$EVTYPE))` event types.  
+* Calculate A New Event Group Variable `(df$EVTGROUP)` to summarize the `r length(table(df$EVTYPE))` event types.  
  
 ```{r, GroupEventTypes}
 df$EVTGROUP <-NA
 #
-df[grep("^astro|^blow-out tide|^high tides",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Tides"
-df[grep("^aval",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Avalanche"
-df[grep("^blizz",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Blizzard"
-df[grep("^coastal flood",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Coastal Flood"
-df[grep("wind chill",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Wind Chill"
-df[grep("debris flow",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Debris Flow"
-df[grep("dense fog",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Dense Fog"
-df[grep("smoke",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Dense Smoke"
-df[grep("drought",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Drought"
-df[grep("dust devil",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Dust Devil"
-df[grep("^dust storm",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Dust Storm"
-df[grep("^excessive heat|record/excessive heat",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Excessive Heat"
-df[grep("extreme cold",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Extreme Cold/Wind Chill"
-df[grep("^flood|flooding$",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Flood"
-df[grep("^flash flood",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Flash Flood"
-df[grep("frost",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Forst/Freeze"
-df[grep("funnel",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Funnel Cloud"
-df[grep("freezing fog",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Freezing Fog"
-df[grep("hail",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Hail"
-df[grep("^excessive heat|^extreme heat|^record heat|^heat|excessive heat$",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Heat"
-df[grep("^heavy rain",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Heavy Rain"
-df[grep("^heavy snow|snow and heavy snow|snow/heavy snow",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Heavy Snow"
-df[grep("^high surf",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"High Surf"
-df[grep("^high wind",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"High Wind"
-df[grep("^hurricane|^typhoon",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Hurricane Typhoon"
-df[grep("^ice storm|glaze/ice storm|sleet/ice storm|snow and ice storm|snow/ice storm",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Ice Storm"
-df[grep("lake-effect snow",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Lake-Effect Snow"
-df[grep("lakeshore flood",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Lakeshore Flood"
-df[grep("^lightning",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Lightning"
-df[grep("marine hail",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Marine Hail"
-df[grep("marine high wind",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Marine High Wind"
-df[grep("marine strong wind",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Marine Strong Wind"
-df[grep("marine thunderstorm wind",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Marine Thunderstorm Wind"
-df[grep("rip current",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Rip Current"
-df[grep("seiche",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Seiche"
-df[grep("sleet|^freezing drizzle|^freezing rain",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Sleet"
-df[grep("storm surge",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Storm Surge"
-df[grep("^strong wind",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Strong Wind"
-df[grep("gusty thunderstorm wind|^severe thunderstorm wind|^thunderstorm wind",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Thunderstorm Wind"
-df[grep("tornado",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Tornado"
-df[grep("tropical depression",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Tropical Depression"
-df[grep("tropical storm",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Tropical Storm"
-df[grep("tsunami",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Tsunami"
-df[grep("volcanic",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Volcanic Ash"
-df[grep("^waterspout",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Waterspout"
-df[grep("wildfire",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Wildfire"
-df[grep("^winter storm",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"WinterStorm"
-df[grep("winter weather",df$EVTYPE, ignore.case = TRUE),"EVTGROUP"] <-"Winter Weather"
+df[grep("^astro|^blow-out tide|^high tides",df$EVTYPE,ignore.case = TRUE),
+     "EVTGROUP"] <-"Tides"
+df[grep("^aval",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Avalanche"
+df[grep("^blizz",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Blizzard"
+df[grep("^coastal flood",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Coastal Flood"
+df[grep("wind chill",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Wind Chill"
+df[grep("debris flow",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Debris Flow"
+df[grep("dense fog",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Dense Fog"
+df[grep("smoke",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Dense Smoke"
+df[grep("drought",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Drought"
+df[grep("dust devil",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Dust Devil"
+df[grep("^dust storm",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Dust Storm"
+df[grep("^excessive heat|record/excessive heat",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Excessive Heat"
+df[grep("extreme cold",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Extreme Cold/Wind Chill"
+df[grep("^flood|flooding$",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Flood"
+df[grep("^flash flood",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Flash Flood"
+df[grep("frost",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Forst/Freeze"
+df[grep("funnel",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Funnel Cloud"
+df[grep("freezing fog",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Freezing Fog"
+df[grep("hail",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Hail"
+df[grep("^excessive heat|^extreme heat|^record heat", df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Heat"
+df[grep("^heat|excessive heat$", df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Heat"
+df[grep("^heavy rain",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Heavy Rain"
+df[grep("^heavy snow|snow and heavy snow|snow/heavy snow",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Heavy Snow"
+df[grep("^high surf",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"High Surf"
+df[grep("^high wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"High Wind"
+df[grep("^hurricane|^typhoon",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Hurricane Typhoon"
+df[grep("^ice storm|glaze/ice storm|sleet/ice storm", df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Ice Storm"
+df[grep("snow and ice storm|snow/ice storm", df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Ice Storm"
+df[grep("lake-effect snow",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Lake-Effect Snow"
+df[grep("lakeshore flood",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Lakeshore Flood"
+df[grep("^lightning",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Lightning"
+df[grep("marine hail",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Marine Hail"
+df[grep("marine high wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Marine High Wind"
+df[grep("marine strong wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Marine Strong Wind"
+df[grep("marine thunderstorm wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Marine Thunderstorm Wind"
+df[grep("rip current",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Rip Current"
+df[grep("seiche",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Seiche"
+df[grep("sleet|^freezing drizzle|^freezing rain",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Sleet"
+df[grep("storm surge",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Storm Surge"
+df[grep("^strong wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Strong Wind"
+df[grep("gusty thunderstorm wind|^severe thunderstorm wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Thunderstorm Wind"
+df[grep("^thunderstorm wind",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Thunderstorm Wind"
+df[grep("tornado",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Tornado"
+df[grep("tropical depression",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Tropical Depression"
+df[grep("tropical storm",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Tropical Storm"
+df[grep("tsunami",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Tsunami"
+df[grep("volcanic",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Volcanic Ash"
+df[grep("^waterspout",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Waterspout"
+df[grep("wildfire",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Wildfire"
+df[grep("^winter storm",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"WinterStorm"
+df[grep("winter weather",df$EVTYPE, ignore.case = TRUE),
+     "EVTGROUP"] <-"Winter Weather"
 
 ```
 
-* #### Calculate New Damage Amount Variables `(df$PROPDMGAMT & df$CROPDMGAMT)` for each event type.
+* Calculate New Damage Amount Variables `(df$PROPDMGAMT & df$CROPDMGAMT)` for each event type.
 
-```{r, CalculateDamageAmounts}
+```{r, CalculateDamageAmounts, tidy=TRUE}
 df$PROPDMGAMT <-NA
 #
-df[grep("[0-9]",df$PROPDMGEXP),"PROPDMGAMT"] <-(10^as.numeric(df[grep("[0-9]",df$PROPDMGEXP,),"PROPDMGEXP"])) * df[grep("[0-9]",df$PROPDMGEXP,),"PROPDMG"] 
-df[grep("B",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("B",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 1000000000 
-df[grep("M",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("M",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 1000000
-df[grep("K",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("K",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 1000
-df[grep("H",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("H",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 100
+df[grep("[0-9]",df$PROPDMGEXP),"PROPDMGAMT"] <-(10^as.numeric(df[grep("[0-9]",
+     df$PROPDMGEXP,),"PROPDMGEXP"])) * df[grep("[0-9]",df$PROPDMGEXP,),"PROPDMG"] 
+df[grep("B",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("B",
+     df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 1000000000 
+df[grep("M",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("M",
+     df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 1000000
+df[grep("K",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("K",
+     df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 1000
+df[grep("H",df$PROPDMGEXP, ignore.case = TRUE),"PROPDMGAMT"] <-df[grep("H",
+     df$PROPDMGEXP, ignore.case = TRUE),"PROPDMG"] * 100
 #
 df$CROPDMGAMT <-NA
 #
-df[grep("[0-9]",df$CROPDMGEXP),"CROPDMGAMT"] <-(10^as.numeric(df[grep("[0-9]",df$CROPDMGEXP,),"CROPDMGEXP"])) * df[grep("[0-9]",df$CROPDMGEXP,),"CROPDMG"] 
-df[grep("B",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("B",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 1000000000 
-df[grep("M",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("M",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 1000000
-df[grep("K",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("K",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 1000
-df[grep("H",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("H",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 100
+df[grep("[0-9]",df$CROPDMGEXP),"CROPDMGAMT"] <-(10^as.numeric(df[grep("[0-9]",
+     df$CROPDMGEXP,),"CROPDMGEXP"])) * df[grep("[0-9]",df$CROPDMGEXP,),"CROPDMG"] 
+df[grep("B",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("B",
+     df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 1000000000 
+df[grep("M",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("M",
+     df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 1000000
+df[grep("K",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("K",
+     df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 1000
+df[grep("H",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("H",
+     df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 100
 ```
 
-* #### Calculate New Total Vectors for Fatalities, Injuries, Property Damage and Crop Damage by Event Group `(df$EVTGROUP)`.
+* Calculate New Total Vectors for Fatalities, Injuries, Property Damage and Crop Damage by Event Group `(df$EVTGROUP)`.
 
 ```{r, CalculateGroupTotals}
 Fatalities <-tapply(X = df$FATALITIES, INDEX = df$EVTGROUP, FUN = sum, na.rm = TRUE)
@@ -128,39 +203,37 @@ CropDmgAmt <-tapply(X = df$CROPDMGAMT, INDEX = df$EVTGROUP, FUN = sum, na.rm = T
 
 ### Results 
 
-* #### Ranking of Event Groups by Population Fatalities.
+* Ranking of Event Groups by Population Fatalities.
 
 ```{r, RankFatalitiesEvents}
 (Fatalities <-sort(x = Fatalities, decreasing = TRUE))
 ```
 
-* #### Ranking of Event Groups by Population Injuries. 
+* Ranking of Event Groups by Population Injuries. 
 
 ```{r, RankInjuriesEvents}
 (Injuries <-sort(x = Injuries, decreasing = TRUE))
 ```
 
-* #### Plot Ranking of Event Groups by Fatalities and Injuries. 
+* Plot Ranking of Event Groups by Fatalities and Injuries. 
 
 ```{r, PlotHealthEffectResults}
 par(mfrow = c(2,1))
-barplot(Fatalities[1:5], ylab = "Total Fatalities")
-barplot(Injuries[1:5], ylab = "Total Injuries")
-par(mfrow = c(1,1))
+barplot(Fatalities[1:3], ylab = "Total Fatalities")
+barplot(Injuries[1:3], ylab = "Total Injuries")
 ```
 
-* #### Ranking of Event Groups by Property & Crop Damage.   
+* Ranking of Event Groups by Property & Crop Damage.   
 
 ```{r, RankDamageEventResults}
 (PropDmgAmt <-sort(x = PropDmgAmt, decreasing = TRUE))
 (CropDmgAmt <-sort(x = CropDmgAmt, decreasing = TRUE))
 ```
 
-* #### Plot Ranking of Event Groups by Property & Crop Damage. 
+* Plot Ranking of Event Groups by Property & Crop Damage. 
 
 ```{r, PlotDamageEventResults}
-barplot(PropDmgAmt[1:5]/1000000000, ylab = "Total Property Damage - $Billons")
-barplot(CropDmgAmt[1:5]/1000000000, ylab = "Total Crop Damage - $Billions")
+par(mfrow = c(1,1))
+barplot(PropDmgAmt[1:3]/1000000000, ylab = "Total Property Damage - $Billons")
+barplot(CropDmgAmt[1:3]/1000000000, ylab = "Total Crop Damage - $Billions")
 ```
-
-
