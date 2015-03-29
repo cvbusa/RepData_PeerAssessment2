@@ -3,13 +3,13 @@ title: 'Health and Economic Consequences of Storms: 1950 - 2011'
 author: "Charles Brown"
 date: "Wednesday, March 18, 2015"
 output:
+  html_document:
+    toc: yes
   pdf_document:
     fig_caption: yes
     fig_height: 6
     fig_width: 8
     number_sections: yes
-    toc: yes
-  html_document:
     toc: yes
   word_document: default
 geometry: margin=1.5cm
