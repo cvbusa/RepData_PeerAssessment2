@@ -9,6 +9,8 @@ output:
     fig_width: 8
     number_sections: yes
     toc: yes
+  html_document:
+    toc: yes
   word_document: default
 geometry: margin=1.5cm
 ---
@@ -25,7 +27,7 @@ strFilename <-"stormdata.bz2"
 strDataDir <-""
 ```
 
-* If needed, download compressed data [file](`r strUrl`).
+* Download the compressed data file:  [`r strUrl`](`r strUrl`).
 
 ```{r, DownloadData}
 strPathFilename <-file.path(getwd(), strDataDir, strFilename, fsep = "/")
@@ -36,7 +38,10 @@ if (!file.exists(strPathFilename))
 }
 ```
 
-* Read select columns into data frame `df`.
+* The compressed data file, `r strFilename`, is very large: 
+    `r round((file.info(strPathFilename)$size)/(2^20), digits = 1)` Megabytes.
+    * Read just the required variables into the data frame.
+    * Cache the read to disk: ```{r, ReadDataIntoDataFrame, cache=TRUE}```.
 
 ```{r, ReadDataIntoDataFrame, cache=TRUE}
 df <-read.csv(file = strPathFilename, stringsAsFactors = FALSE,
@@ -46,7 +51,7 @@ df <-read.csv(file = strPathFilename, stringsAsFactors = FALSE,
 summary(df)
 ```
 
-* Calculate A New Event Group Variable `(df$EVTGROUP)` to summarize the `r length(table(df$EVTYPE))` event types.  
+* Calculate a new Event Group variable `(df$EVTGROUP)` to summarize the `r length(table(df$EVTYPE))` Event Types.  
  
 ```{r, GroupEventTypes}
 df$EVTGROUP <-NA
@@ -156,7 +161,7 @@ df[grep("winter weather",df$EVTYPE, ignore.case = TRUE),
 
 ```
 
-* Calculate New Damage Amount Variables `(df$PROPDMGAMT & df$CROPDMGAMT)` for each event type.
+* Calculate new Damage Amount variables `(df$PROPDMGAMT & df$CROPDMGAMT)` for each Event Type.
 
 ```{r, CalculateDamageAmounts, tidy=TRUE}
 df$PROPDMGAMT <-NA
@@ -186,7 +191,7 @@ df[grep("H",df$CROPDMGEXP, ignore.case = TRUE),"CROPDMGAMT"] <-df[grep("H",
      df$CROPDMGEXP, ignore.case = TRUE),"CROPDMG"] * 100
 ```
 
-* Calculate New Total Vectors for Fatalities, Injuries, Property Damage and Crop Damage by Event Group `(df$EVTGROUP)`.
+* Calculate new Total Vectors for Fatalities, Injuries, Property Damage and Crop Damage by the Event Group `(df$EVTGROUP)`.
 
 ```{r, CalculateGroupTotals}
 Fatalities <-tapply(X = df$FATALITIES, INDEX = df$EVTGROUP, FUN = sum, na.rm = TRUE)
@@ -197,19 +202,19 @@ CropDmgAmt <-tapply(X = df$CROPDMGAMT, INDEX = df$EVTGROUP, FUN = sum, na.rm = T
 
 ### Results 
 
-* Ranking of Event Groups by Population Fatalities.
+* Rank Event Groups by the number of Population Fatalities.
 
 ```{r, RankFatalitiesEvents}
 (Fatalities <-sort(x = Fatalities, decreasing = TRUE))
 ```
 
-* Ranking of Event Groups by Population Injuries. 
+* Rank the Event Groups by the number of Population Injuries. 
 
 ```{r, RankInjuriesEvents}
 (Injuries <-sort(x = Injuries, decreasing = TRUE))
 ```
 
-* Plot Ranking of Event Groups by Fatalities and Injuries. 
+* Plot the Top 3 Event Groups by Fatalities and Injuries. 
 
 ```{r, PlotHealthEffectResults}
 par(mfrow = c(2,1))
@@ -217,14 +222,14 @@ barplot(Fatalities[1:3], ylab = "Total Fatalities")
 barplot(Injuries[1:3], ylab = "Total Injuries")
 ```
 
-* Ranking of Event Groups by Property & Crop Damage.   
+* Rank the Event Groups by the amount of Property & Crop Damage.   
 
 ```{r, RankDamageEventResults}
 (PropDmgAmt <-sort(x = PropDmgAmt, decreasing = TRUE))
 (CropDmgAmt <-sort(x = CropDmgAmt, decreasing = TRUE))
 ```
 
-* Plot Ranking of Event Groups by Property & Crop Damage. 
+* Plot the Top 3 Event Groups by the amount of Property & Crop Damage. 
 
 ```{r, PlotDamageEventResults}
 par(mfrow = c(1,1))
